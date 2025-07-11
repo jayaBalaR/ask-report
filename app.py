@@ -1,21 +1,35 @@
 import streamlit as st
-from docx import Document
+import os
 
 # --------------------------
 # Config and Title
 # --------------------------
-st.set_page_config(page_title="📘 Page Flip from DOCX", layout="centered")
-st.title("📄 Page Flip Viewer - report1.docx")
+st.set_page_config(page_title="📘 TXT Page Flip App", layout="centered")
+st.title("📄 Page Flip Viewer - report1.txt")
 
 # --------------------------
-# Load and read docx content
+# Load and split txt file content
 # --------------------------
-def read_docx_as_pages(filepath):
-    doc = Document(filepath)
-    return [para.text.strip() for para in doc.paragraphs if para.text.strip()]
+def read_txt_as_pages(filepath, delimiter="\n\n"):
+    with open(filepath, "r", encoding="utf-8") as file:
+        content = file.read()
+        # Split into pages using double newline as default
+        return [page.strip() for page in content.split(delimiter) if page.strip()]
 
-# Read the file directly
-pages = read_docx_as_pages("./report1.docx")  # Make sure it's in the same folder
+# --------------------------
+# Get absolute path to the txt file
+# --------------------------
+script_dir = os.path.dirname(os.path.abspath(__file__))
+txt_path = os.path.join(script_dir, "report1.txt")
+
+# --------------------------
+# Check and load
+# --------------------------
+if not os.path.exists(txt_path):
+    st.error(f"❌ File 'report1.txt' not found at:\n{txt_path}")
+    st.stop()
+
+pages = read_txt_as_pages(txt_path)
 
 # --------------------------
 # Initialize session state
@@ -24,7 +38,7 @@ if "page_number" not in st.session_state:
     st.session_state.page_number = 0
 
 # --------------------------
-# Navigation
+# Navigation buttons
 # --------------------------
 col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -37,16 +51,13 @@ with col3:
         st.session_state.page_number += 1
 
 # --------------------------
-# Show current page content
+# Display current page
 # --------------------------
-current_page = st.session_state.page_number
-st.markdown(f"### Page {current_page + 1}")
-st.text_area("Page Content", pages[current_page], height=300)
+pg = st.session_state.page_number
+st.markdown(f"### Page {pg + 1}")
+st.text_area("Page Content", pages[pg], height=300)
 
-# --------------------------
-# Page count footer
-# --------------------------
 st.markdown(
-    f"<p style='text-align:center;color:grey;'>Page {current_page + 1} of {len(pages)}</p>",
+    f"<p style='text-align:center;color:grey;'>Page {pg + 1} of {len(pages)}</p>",
     unsafe_allow_html=True,
 )
