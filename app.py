@@ -55,7 +55,7 @@ with col3:
 # --------------------------
 pg = st.session_state.page_number
 st.markdown(f"### Page {pg + 1}")
-st.code(content, language="text") 
+st.markdown(content)
 
 st.markdown(
     f"<p style='text-align:center;color:grey;'>Page {pg + 1} of {len(pages)}</p>",
