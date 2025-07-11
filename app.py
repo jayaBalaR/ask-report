@@ -15,7 +15,7 @@ def read_docx_as_pages(filepath):
     return [para.text.strip() for para in doc.paragraphs if para.text.strip()]
 
 # Read the file directly
-pages = read_docx_as_pages("report1.docx")  # Make sure it's in the same folder
+pages = read_docx_as_pages(r'./report1.docx')  # Make sure it's in the same folder
 
 # --------------------------
 # Initialize session state
