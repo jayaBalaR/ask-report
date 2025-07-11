@@ -2,15 +2,15 @@ import streamlit as st
 from docx import Document
 import os
 
-# -----------------------------------
-# Page setup
-# -----------------------------------
+# -------------------------------
+# App Setup
+# -------------------------------
 st.set_page_config(page_title="📘 DOCX Page Flip App", layout="centered")
 st.title("📄 Multi-DOCX Page Flip Viewer")
 
-# -----------------------------------
-# Read all .docx files in the current directory
-# -----------------------------------
+# -------------------------------
+# Function to read all docx files
+# -------------------------------
 def load_all_docx_files(folder_path):
     pages = []
     for filename in sorted(os.listdir(folder_path)):
@@ -18,44 +18,46 @@ def load_all_docx_files(folder_path):
             file_path = os.path.join(folder_path, filename)
             try:
                 doc = Document(file_path)
-                content = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
-                if not content.strip():
+                content = "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
+                if not content:
                     content = "[Empty document]"
-                pages.append((filename, content))
             except Exception as e:
-                pages.append((filename, f"[Error reading file: {e}]"))
+                content = f"[Error reading '{filename}': {e}]"
+            pages.append((filename, content))
     return pages
 
-# -----------------------------------
-# Load files
-# -----------------------------------
+# -------------------------------
+# Load documents
+# -------------------------------
 script_dir = os.path.dirname(os.path.abspath(__file__))
 pages = load_all_docx_files(script_dir)
 
 if not pages:
-    st.error("❌ No .docx files found in this folder.")
+    st.error("❌ No .docx files found in the current folder.")
     st.stop()
 
-# -----------------------------------
-# Session state for page tracking
-# -----------------------------------
+# -------------------------------
+# Session state initialization
+# -------------------------------
 if "page_number" not in st.session_state:
     st.session_state.page_number = 0
 
-# -----------------------------------
+# -------------------------------
 # Navigation controls
-# -----------------------------------
+# -------------------------------
 col1, col2, col3 = st.columns([1, 2, 1])
+
 with col1:
     if st.button("⬅️ Previous") and st.session_state.page_number > 0:
         st.session_state.page_number -= 1
+
 with col3:
     if st.button("Next ➡️") and st.session_state.page_number < len(pages) - 1:
         st.session_state.page_number += 1
 
-# -----------------------------------
+# -------------------------------
 # Display current page (read-only)
-# -----------------------------------
+# -------------------------------
 pg = st.session_state.page_number
 filename, content = pages[pg]
 
