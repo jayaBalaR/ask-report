@@ -6,7 +6,7 @@ st.set_page_config(page_title="📖 DOCX Book Reader", layout="centered")
 st.title("📄 Page Flip App from Local DOCX File")
 
 # --- Path to docx file in the repo ---
-DOCX_PATH = os.path.join(os.path.dirname(__file__), "./reports/report1.docx")
+DOCX_PATH = os.path.join(os.path.dirname(__file__), "report1.docx")
 
 # --- Load paragraphs as pages ---
 def extract_pages_from_docx(filepath):
