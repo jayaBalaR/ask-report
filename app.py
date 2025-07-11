@@ -1,31 +1,31 @@
 import streamlit as st
 from docx import Document
-import os
 
-st.set_page_config(page_title="📘 DOCX Page Flip App", layout="centered")
-st.title("📄 Page Flip Viewer (from report1.docx)")
+# --------------------------
+# Config and Title
+# --------------------------
+st.set_page_config(page_title="📘 Page Flip from DOCX", layout="centered")
+st.title("📄 Page Flip Viewer - report1.docx")
 
-# --- Resolve path ---
-current_dir = os.path.dirname(os.path.abspath(__file__))
-filename = "report1.docx"
-docx_path = os.path.join(current_dir, filename)
-
-# --- Check if file exists ---
-if not os.path.exists(docx_path):
-    st.error(f"❌ File '{filename}' not found at: {docx_path}")
-    st.stop()
-
-# --- Function to read document ---
-def extract_pages_from_docx(path):
-    doc = Document(path)
+# --------------------------
+# Load and read docx content
+# --------------------------
+def read_docx_as_pages(filepath):
+    doc = Document(filepath)
     return [para.text.strip() for para in doc.paragraphs if para.text.strip()]
 
-# --- Read and display ---
-pages = extract_pages_from_docx(docx_path)
+# Read the file directly
+pages = read_docx_as_pages("report1.docx")  # Make sure it's in the same folder
 
+# --------------------------
+# Initialize session state
+# --------------------------
 if "page_number" not in st.session_state:
     st.session_state.page_number = 0
 
+# --------------------------
+# Navigation
+# --------------------------
 col1, col2, col3 = st.columns([1, 2, 1])
 
 with col1:
@@ -36,11 +36,17 @@ with col3:
     if st.button("Next ➡️") and st.session_state.page_number < len(pages) - 1:
         st.session_state.page_number += 1
 
-current_page = pages[st.session_state.page_number]
-st.markdown(f"### Page {st.session_state.page_number + 1}")
-st.text_area("Content", current_page, height=300)
+# --------------------------
+# Show current page content
+# --------------------------
+current_page = st.session_state.page_number
+st.markdown(f"### Page {current_page + 1}")
+st.text_area("Page Content", pages[current_page], height=300)
 
+# --------------------------
+# Page count footer
+# --------------------------
 st.markdown(
-    f"<p style='text-align:center;color:grey;'>Page {st.session_state.page_number + 1} of {len(pages)}</p>",
+    f"<p style='text-align:center;color:grey;'>Page {current_page + 1} of {len(pages)}</p>",
     unsafe_allow_html=True,
 )
